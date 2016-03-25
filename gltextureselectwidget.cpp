@@ -143,7 +143,7 @@ void glTextureSelectWidget::mousePressEvent(QMouseEvent* mouseEvent)
          constraintVertex.y = point.leftBottom.y + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
          constraintVertex.z = 0;
 
-         MainWindow::globalInstance->progressWidget->addConstraintMatchAddVertexInTexture(constraintVertex);
+         MainWindow::globalInstance->progressWidget->addConstraintMatchForTexture(constraintVertex);
     }
 
     //redraw glWidget
@@ -277,7 +277,7 @@ void glTextureSelectWidget::triangulatePoints()
     updateGL();
 }
 
-void glTextureSelectWidget::SetEnableConstraint(bool aValue)
+void glTextureSelectWidget::SetEnableConstraintSelection(bool aValue)
 {
    enableSetConstraint = aValue;
 }

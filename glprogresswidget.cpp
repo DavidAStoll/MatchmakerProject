@@ -132,25 +132,26 @@ void glProgressWidget::mousePressEvent(QMouseEvent* mouseEvent)
     updateGL();
 }
 
-void glProgressWidget::addConstraintMatchAddVertexInMesh(MathAlgorithms::Vertex aVertex)
+void glProgressWidget::addConstraintMatchForMesh(MathAlgorithms::Vertex aVertex)
 {
     glProgressWidget::ConstraintMatch newMatch;
     newMatch.vertexInMesh = aVertex;
     ConstraintMatches.append(newMatch);
 
     //change flags for widgets
-    MainWindow::globalInstance->glMeshWidget->SetEnableConstraint(false);
-    MainWindow::globalInstance->glTextureWidget->SetEnableConstraint(true);
+    MainWindow::globalInstance->glMeshWidget->SetEnableConstraintSelection(false);
+    MainWindow::globalInstance->glTextureWidget->SetEnableConstraintSelection(true);
     MainWindow::globalInstance->matchAction->setEnabled(false); //since we still need another vertex for texture
 }
 
-void glProgressWidget::addConstraintMatchAddVertexInTexture(MathAlgorithms::Vertex aVertex)
+void glProgressWidget::addConstraintMatchForTexture(MathAlgorithms::Vertex aVertex)
 {
+    //should already be created beforehand since Mesh selection happens always first
     ConstraintMatches[ConstraintMatches.size() - 1].vertexInTexture = aVertex;
 
     //change flags for widgets
-    MainWindow::globalInstance->glMeshWidget->SetEnableConstraint(true);
-    MainWindow::globalInstance->glTextureWidget->SetEnableConstraint(false);
+    MainWindow::globalInstance->glMeshWidget->SetEnableConstraintSelection(true);
+    MainWindow::globalInstance->glTextureWidget->SetEnableConstraintSelection(false);
     MainWindow::globalInstance->matchAction->setEnabled(true); //since we have a full set of pairs now
 }
 

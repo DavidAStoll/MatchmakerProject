@@ -57,7 +57,7 @@ public:
 
     void loadTextureFromFile(QString& fileName);
     void triangulatePoints();
-    void SetEnableConstraint(bool aValue);
+    void SetEnableConstraintSelection(bool aValue);
     QVector<MathAlgorithms::Vertex> createBorderConstraints();
 
 

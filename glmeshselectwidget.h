@@ -61,7 +61,7 @@ public:
 
     // called when the user wants to parameterize mesh
     void parameterizeMesh();
-    void SetEnableConstraint(bool aValue);
+    void SetEnableConstraintSelection(bool aValue);
     QVector<MathAlgorithms::Vertex> createBorderConstraints();
 
     QVector<vertex*>* GetVertices();
@@ -85,12 +85,41 @@ private:
 
     struct constraintPoint
     {
-        int pixelXLocation;
-        int pixelYLocation;
+        GLfloat pixelXLocation;
+        GLfloat pixelYLocation;
+
+        //for displaying
         constraintVertex rightBottom;
         constraintVertex rightTop;
         constraintVertex leftBottom;
         constraintVertex leftTop;
+
+        constraintPoint()
+        {
+        }
+
+        constraintPoint(GLfloat xLocation, GLfloat yLocation)
+        {
+            pixelXLocation = xLocation;
+            pixelYLocation = yLocation;
+
+            //Left Bottom
+            leftBottom.x = xLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
+            leftBottom.y = yLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
+            leftBottom.z = 0;
+            //Left Top
+            leftTop.x = xLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
+            leftTop.y = yLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
+            leftTop.z = 0;
+            //Right Bottom
+            rightBottom.x = xLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
+            rightBottom.y = yLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
+            rightBottom.z = 0;
+            //Right Top
+            rightTop.x = xLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
+            rightTop.y = yLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
+            rightTop.z = 0;
+        }
     };
 
     void DrawObject();

@@ -26,15 +26,12 @@ void glMeshSelectWidget::initializeGL()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     glEnable( GL_NORMALIZE );
-    //glEnable(GL_DEPTH_TEST);
 }
 
 void glMeshSelectWidget::paintGL()
 {
     glClearColor( 1.0f, 1.0f, 1.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    //glShadeModel( GL_FLAT );
     glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     // Draw meshes
@@ -101,37 +98,17 @@ void glMeshSelectWidget::mousePressEvent(QMouseEvent *event)
         //find the closest vertices to this event
         std::vector<GLfloat> closestVertex = GetClosestVertex(glXLocation, glYLocation);
 
-        //X and Y location is always center of the constraint point
-        int vXLocation = (int) closestVertex[0];
-        int vYLocation = (int) closestVertex[1];
-        constraintPoint newPoint;
-        newPoint.pixelXLocation = vXLocation;
-        newPoint.pixelYLocation = vYLocation;
-        //Left Bottom
-        newPoint.leftBottom.x = vXLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
-        newPoint.leftBottom.y = vYLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
-        newPoint.leftBottom.z = 0;
-        //Left Top
-        newPoint.leftTop.x = vXLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
-        newPoint.leftTop.y = vYLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
-        newPoint.leftTop.z = 0;
-        //Right Bottom
-        newPoint.rightBottom.x = vXLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
-        newPoint.rightBottom.y = vYLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
-        newPoint.rightBottom.z = 0;
-        //Right Top
-        newPoint.rightTop.x = vXLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
-        newPoint.rightTop.y = vYLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
-        newPoint.rightTop.z = 0;
+        //add visual element for this constraint point to mesh display
+        GLfloat closestXLocation = closestVertex[0];
+        GLfloat closestYLocation = closestVertex[1];
+        m_userConstraints.push_back(constraintPoint(closestXLocation, closestYLocation));
 
-        m_userConstraints.push_back(newPoint);
-
+        //add selected vertex to match list
         MathAlgorithms::Vertex constraintVertex;
         constraintVertex.x = closestVertex[0];
         constraintVertex.y = closestVertex[1];
         constraintVertex.z = closestVertex[2];
-
-        MainWindow::globalInstance->progressWidget->addConstraintMatchAddVertexInMesh(constraintVertex);
+        MainWindow::globalInstance->progressWidget->addConstraintMatchForMesh(constraintVertex);
     }
 
     //redraw glWidget
@@ -206,9 +183,6 @@ void glMeshSelectWidget::DrawObject()
         for ( unsigned int j = 0; j < m_faces[i].size(); ++j )
         {
             unsigned int vertexIndex = m_faces[i][j];
-            //std::vector<GLfloat> n = m_vNormals[vertexIndex];
-            //Normalize( n );
-            //glNormal3f( n[0], n[1], n[2] );
 
             std::vector<GLfloat> currentVertex = m_vertices[ vertexIndex - 1 ];
             glVertex3f( currentVertex[0], currentVertex[1], currentVertex[2] );
@@ -242,40 +216,8 @@ glMeshSelectWidget::constraintPoint glMeshSelectWidget::CreateContraintPoint(int
 {
     int glXLocation = ((float)x / m_widgetWidth) * GL_MESHWIDGET_CANVAS_WIDTH + X_OFFSET;
     int glYLocation = ((float)(m_widgetHeight - y) / m_widgetHeight) * GL_MESHWIDGET_CANVAS_HEIGHT + Y_OFFSET;
-//    int glXLocation = x;
-//    int glYLocation = y;
 
-//    std::vector<GLfloat> closestVertex = GetClosestVertex( glXLocation, glYLocation );
-//    m_constraints.push_back( closestVertex );
-
-//    printf("border: %d %d\n", glXLocation, glYLocation);
-//    printf("closest: %f %f\n", closestVertex[0], closestVertex[1]);
-
-//    glXLocation = (int)closestVertex[0];
-//    glYLocation = (int)closestVertex[1];
-
-    //X and Y location is always center of the constraint point
-    constraintPoint newPoint;
-    newPoint.pixelXLocation = glXLocation;
-    newPoint.pixelYLocation = glYLocation;
-    //Left Bottom
-    newPoint.leftBottom.x = glXLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
-    newPoint.leftBottom.y = glYLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
-    newPoint.leftBottom.z = 0;
-    //Left Top
-    newPoint.leftTop.x = glXLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
-    newPoint.leftTop.y = glYLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
-    newPoint.leftTop.z = 0;
-    //Right Bottom
-    newPoint.rightBottom.x = glXLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
-    newPoint.rightBottom.y = glYLocation - GL_MESHWIDGET_CONSTRAINT_SIZE;
-    newPoint.rightBottom.z = 0;
-    //Right Top
-    newPoint.rightTop.x = glXLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
-    newPoint.rightTop.y = glYLocation + GL_MESHWIDGET_CONSTRAINT_SIZE;
-    newPoint.rightTop.z = 0;
-
-    return newPoint;
+    return constraintPoint(glXLocation, glYLocation);
 }
 
 void glMeshSelectWidget::AddEdgesAndTriangles()
@@ -617,7 +559,7 @@ QVector<glMeshSelectWidget::triangle*>* glMeshSelectWidget::GetTriangles()
     return &m_qTriangles;
 }
 
-void glMeshSelectWidget::SetEnableConstraint(bool aValue)
+void glMeshSelectWidget::SetEnableConstraintSelection(bool aValue)
 {
    enableSetConstraint = aValue;
 }

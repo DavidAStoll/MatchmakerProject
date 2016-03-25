@@ -49,8 +49,8 @@ public:
     void performMatch();
     //void performEmbed();
 
-    void addConstraintMatchAddVertexInMesh(MathAlgorithms::Vertex aVertex);
-    void addConstraintMatchAddVertexInTexture(MathAlgorithms::Vertex aVertex);
+    void addConstraintMatchForMesh(MathAlgorithms::Vertex aVertex);
+    void addConstraintMatchForTexture(MathAlgorithms::Vertex aVertex);
 
     QVector<validateTriangulation> GetValidTriangulations();
 
