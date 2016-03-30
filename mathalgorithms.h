@@ -2,15 +2,36 @@
 #define MATHALGORITHMS_H
 
 #include <QVector>
+#include <QGLWidget>
+
 
 class MathAlgorithms
 {
 public:
     struct Vertex
     {
-        float x;
-        float y;
-        float z;
+        GLfloat x;
+        GLfloat y;
+        GLfloat z;
+
+        Vertex()
+        {
+            x = 0;
+            y = 0;
+            z = 0;
+        }
+
+        Vertex(GLfloat xLocation, GLfloat yLocation)
+        {
+            x = xLocation;
+            y = yLocation;
+            z = 0;
+        }
+
+        bool operator==(Vertex& otherVertex)
+        {
+            return x == otherVertex.x && y == otherVertex.y;
+        }
     };
 
     struct Triangle

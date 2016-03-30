@@ -37,15 +37,15 @@ void glProgressWidget::paintGL()
 
         for(int i = 0; i < meshTriangles->size(); i++)
         {
-            glMeshSelectWidget::triangle* triangle = meshTriangles->value(i);
+            glMeshSelectWidget::Triangle* triangle = meshTriangles->value(i);
 
             //draw triangle mesh
             glBegin( GL_TRIANGLES );
 
             //set vertex
-            glVertex3f(triangle->vertexA->x, triangle->vertexA->y, triangle->vertexA->z);
-            glVertex3f(triangle->vertexB->x, triangle->vertexB->y, triangle->vertexB->z);
-            glVertex3f(triangle->vertexC->x, triangle->vertexC->y, triangle->vertexC->z);
+            glVertex3f(triangle->vertexA->vertexCor.x, triangle->vertexA->vertexCor.y, triangle->vertexA->vertexCor.z);
+            glVertex3f(triangle->vertexB->vertexCor.x, triangle->vertexB->vertexCor.y, triangle->vertexB->vertexCor.z);
+            glVertex3f(triangle->vertexC->vertexCor.x, triangle->vertexC->vertexCor.y, triangle->vertexC->vertexCor.z);
 
             glEnd();
         }
@@ -60,15 +60,15 @@ void glProgressWidget::paintGL()
             //draw edges
             for(int ii = 0; ii < constraintWithEdges->edgesIWalked.size(); ii++)
             {
-                glMeshSelectWidget::vertex* vertexA = constraintWithEdges->edgesIWalked[ii]->vertexA;
-                glMeshSelectWidget::vertex* vertexB = constraintWithEdges->edgesIWalked[ii]->vertexB;
+                glMeshSelectWidget::Vertex* vertexA = constraintWithEdges->edgesIWalked[ii]->vertexA;
+                glMeshSelectWidget::Vertex* vertexB = constraintWithEdges->edgesIWalked[ii]->vertexB;
 
                 //draw line for edge
                 glBegin( GL_LINES );
 
                 //set vertex
-                glVertex3f(vertexA->x, vertexA->y, vertexA->z);
-                glVertex3f(vertexB->x, vertexB->y, vertexB->z);
+                glVertex3f(vertexA->vertexCor.x, vertexA->vertexCor.y, vertexA->vertexCor.z);
+                glVertex3f(vertexB->vertexCor.x, vertexB->vertexCor.y, vertexB->vertexCor.z);
 
                 glEnd();
             }
@@ -77,24 +77,24 @@ void glProgressWidget::paintGL()
             glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); //constraint points should be filled
 
             MathAlgorithms::Vertex bottomLeftA, bottomRightA, topRightA, topLeftA;
-            bottomLeftA.x = constraintWithEdges->startVertex->x - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            bottomLeftA.y = constraintWithEdges->startVertex->y - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            bottomRightA.x = constraintWithEdges->startVertex->x + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            bottomRightA.y = constraintWithEdges->startVertex->y - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            topRightA.x = constraintWithEdges->startVertex->x + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            topRightA.y = constraintWithEdges->startVertex->y + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            topLeftA.x = constraintWithEdges->startVertex->x - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            topLeftA.y = constraintWithEdges->startVertex->y + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            bottomLeftA.x = constraintWithEdges->startVertex->vertexCor.x - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            bottomLeftA.y = constraintWithEdges->startVertex->vertexCor.y - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            bottomRightA.x = constraintWithEdges->startVertex->vertexCor.x + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            bottomRightA.y = constraintWithEdges->startVertex->vertexCor.y - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            topRightA.x = constraintWithEdges->startVertex->vertexCor.x + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            topRightA.y = constraintWithEdges->startVertex->vertexCor.y + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            topLeftA.x = constraintWithEdges->startVertex->vertexCor.x - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            topLeftA.y = constraintWithEdges->startVertex->vertexCor.y + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
 
             MathAlgorithms::Vertex bottomLeftB, bottomRightB, topRightB, topLeftB;
-            bottomLeftB.x = constraintWithEdges->targetVertex->x - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            bottomLeftB.y = constraintWithEdges->targetVertex->y - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            bottomRightB.x = constraintWithEdges->targetVertex->x + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            bottomRightB.y = constraintWithEdges->targetVertex->y - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            topRightB.x = constraintWithEdges->targetVertex->x + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            topRightB.y = constraintWithEdges->targetVertex->y + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            topLeftB.x = constraintWithEdges->targetVertex->x - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
-            topLeftB.y = constraintWithEdges->targetVertex->y + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            bottomLeftB.x = constraintWithEdges->targetVertex->vertexCor.x - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            bottomLeftB.y = constraintWithEdges->targetVertex->vertexCor.y - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            bottomRightB.x = constraintWithEdges->targetVertex->vertexCor.x + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            bottomRightB.y = constraintWithEdges->targetVertex->vertexCor.y - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            topRightB.x = constraintWithEdges->targetVertex->vertexCor.x + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            topRightB.y = constraintWithEdges->targetVertex->vertexCor.y + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            topLeftB.x = constraintWithEdges->targetVertex->vertexCor.x - GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
+            topLeftB.y = constraintWithEdges->targetVertex->vertexCor.y + GL_PROGRESSWIDGET_CONSTRAINT_SIZE;
 
             //start Vertext Constraint
             glBegin( GL_TRIANGLE_STRIP );
@@ -184,28 +184,28 @@ void glProgressWidget::performMatch()
     meshTriangles = MainWindow::globalInstance->glMeshWidget->GetTriangles();
 
     //need to get triangles fromed in texture
-    QVector<glMeshSelectWidget::triangle*>& textureTriangles = MainWindow::globalInstance->glTextureWidget->GetTriangles();
+    QVector<glMeshSelectWidget::Triangle*>& textureTriangles = MainWindow::globalInstance->glTextureWidget->GetTriangles();
 
     for(int i = 0; i < textureTriangles.size(); i++)
     {
-        glMeshSelectWidget::vertex* meshVerticesA = 0;
-        glMeshSelectWidget::vertex* meshVerticesB = 0;
-        glMeshSelectWidget::vertex* meshVerticesC = 0;
+        glMeshSelectWidget::Vertex* meshVerticesA = 0;
+        glMeshSelectWidget::Vertex* meshVerticesB = 0;
+        glMeshSelectWidget::Vertex* meshVerticesC = 0;
 
         //get vertexA in mesh that corresponds to constraint in texture
         for(int ii = 0; ii < ConstraintMatches.size(); ii++)
         {
             //find what texture vertex matches the correct constrant Vertex
-            if(textureTriangles[i]->vertexA->x == ConstraintMatches[ii].vertexInTexture.x
-            && textureTriangles[i]->vertexA->y == ConstraintMatches[ii].vertexInTexture.y
-            && textureTriangles[i]->vertexA->z == ConstraintMatches[ii].vertexInTexture.z)
+            if(textureTriangles[i]->vertexA->vertexCor.x == ConstraintMatches[ii].vertexInTexture.x
+            && textureTriangles[i]->vertexA->vertexCor.y == ConstraintMatches[ii].vertexInTexture.y
+            && textureTriangles[i]->vertexA->vertexCor.z == ConstraintMatches[ii].vertexInTexture.z)
             {
                 for(int iii = 0; iii < meshVertices->size(); iii++)
                 {
                     //find what constraint mesh vertex matches the meshVertices
-                    if(ConstraintMatches[ii].vertexInMesh.x == meshVertices->value(iii)->x
-                    && ConstraintMatches[ii].vertexInMesh.y == meshVertices->value(iii)->y
-                    && ConstraintMatches[ii].vertexInMesh.z == meshVertices->value(iii)->z)
+                    if(ConstraintMatches[ii].vertexInMesh.x == meshVertices->value(iii)->vertexCor.x
+                    && ConstraintMatches[ii].vertexInMesh.y == meshVertices->value(iii)->vertexCor.y
+                    && ConstraintMatches[ii].vertexInMesh.z == meshVertices->value(iii)->vertexCor.z)
                     {
                         meshVerticesA = meshVertices->value(iii);
                         break;
@@ -218,16 +218,16 @@ void glProgressWidget::performMatch()
         for(int ii = 0; ii < ConstraintMatches.size(); ii++)
         {
             //find what texture vertex matches the correct constrant Vertex
-            if(textureTriangles[i]->vertexB->x == ConstraintMatches[ii].vertexInTexture.x
-            && textureTriangles[i]->vertexB->y == ConstraintMatches[ii].vertexInTexture.y
-            && textureTriangles[i]->vertexB->z == ConstraintMatches[ii].vertexInTexture.z)
+            if(textureTriangles[i]->vertexB->vertexCor.x == ConstraintMatches[ii].vertexInTexture.x
+            && textureTriangles[i]->vertexB->vertexCor.y == ConstraintMatches[ii].vertexInTexture.y
+            && textureTriangles[i]->vertexB->vertexCor.z == ConstraintMatches[ii].vertexInTexture.z)
             {
                 for(int iii = 0; iii < meshVertices->size(); iii++)
                 {
                     //find what constraint mesh vertex matches the meshVertices
-                    if(ConstraintMatches[ii].vertexInMesh.x == meshVertices->value(iii)->x
-                    && ConstraintMatches[ii].vertexInMesh.y == meshVertices->value(iii)->y
-                    && ConstraintMatches[ii].vertexInMesh.z == meshVertices->value(iii)->z)
+                    if(ConstraintMatches[ii].vertexInMesh.x == meshVertices->value(iii)->vertexCor.x
+                    && ConstraintMatches[ii].vertexInMesh.y == meshVertices->value(iii)->vertexCor.y
+                    && ConstraintMatches[ii].vertexInMesh.z == meshVertices->value(iii)->vertexCor.z)
                     {
                         meshVerticesB = meshVertices->value(iii);
                         break;
@@ -240,16 +240,16 @@ void glProgressWidget::performMatch()
         for(int ii = 0; ii < ConstraintMatches.size(); ii++)
         {
             //find what texture vertex matches the correct constrant Vertex
-            if(textureTriangles[i]->vertexC->x == ConstraintMatches[ii].vertexInTexture.x
-            && textureTriangles[i]->vertexC->y == ConstraintMatches[ii].vertexInTexture.y
-            && textureTriangles[i]->vertexC->z == ConstraintMatches[ii].vertexInTexture.z)
+            if(textureTriangles[i]->vertexC->vertexCor.x == ConstraintMatches[ii].vertexInTexture.x
+            && textureTriangles[i]->vertexC->vertexCor.y == ConstraintMatches[ii].vertexInTexture.y
+            && textureTriangles[i]->vertexC->vertexCor.z == ConstraintMatches[ii].vertexInTexture.z)
             {
                 for(int iii = 0; iii < meshVertices->size(); iii++)
                 {
                     //find what constraint mesh vertex matches the meshVertices
-                    if(ConstraintMatches[ii].vertexInMesh.x == meshVertices->value(iii)->x
-                    && ConstraintMatches[ii].vertexInMesh.y == meshVertices->value(iii)->y
-                    && ConstraintMatches[ii].vertexInMesh.z == meshVertices->value(iii)->z)
+                    if(ConstraintMatches[ii].vertexInMesh.x == meshVertices->value(iii)->vertexCor.x
+                    && ConstraintMatches[ii].vertexInMesh.y == meshVertices->value(iii)->vertexCor.y
+                    && ConstraintMatches[ii].vertexInMesh.z == meshVertices->value(iii)->vertexCor.z)
                     {
                         meshVerticesC = meshVertices->value(iii);
                         break;
@@ -339,8 +339,8 @@ void glProgressWidget::walkToVertex(edgeWalker* walker, glProgressWidget::constr
 
     for(int i = 0; i < walker->startVertex->edgeIndicies.size(); i++)
     {
-         glMeshSelectWidget::edge* currentEdge = meshEdges->value(walker->startVertex->edgeIndicies[i]);
-         glMeshSelectWidget::vertex* goToVertex = 0;
+         glMeshSelectWidget::Edge* currentEdge = meshEdges->value(walker->startVertex->edgeIndicies[i]);
+         glMeshSelectWidget::Vertex* goToVertex = 0;
 
          if(currentEdge->vertexA == walker->startVertex)
          {
@@ -363,8 +363,8 @@ void glProgressWidget::walkToVertex(edgeWalker* walker, glProgressWidget::constr
          {
              //distance to target
              MathAlgorithms::Vertex distance;
-             distance.x = walker->targetVertex->x - goToVertex->x;
-             distance.y = walker->targetVertex->y - goToVertex->y;
+             distance.x = walker->targetVertex->vertexCor.x - goToVertex->vertexCor.x;
+             distance.y = walker->targetVertex->vertexCor.y - goToVertex->vertexCor.y;
              float dist = sqrt((distance.x * distance.x) +  (distance.y * distance.y));
 
              distances.append(dist);
@@ -378,8 +378,8 @@ void glProgressWidget::walkToVertex(edgeWalker* walker, glProgressWidget::constr
         if(distances[i] < shortestDisance || shortestDisance == -1)
         {
             bool notGoodEdge = false;
-            glMeshSelectWidget::edge* candidateEdge = meshEdges->value(walker->startVertex->edgeIndicies[i]);
-            glMeshSelectWidget::vertex* goToVertex = 0;
+            glMeshSelectWidget::Edge* candidateEdge = meshEdges->value(walker->startVertex->edgeIndicies[i]);
+            glMeshSelectWidget::Vertex* goToVertex = 0;
 
             //what vertex are we going to?
             if(candidateEdge->vertexA == walker->startVertex)
@@ -446,7 +446,7 @@ void glProgressWidget::walkToVertex(edgeWalker* walker, glProgressWidget::constr
                 {
                     glProgressWidget::constraintOrientation constraintOrient = constraintOrientations.constraintOrientations[indexConstraints];
 
-                    if(constraintOrient.constraintVertex.x == goToVertex->x && constraintOrient.constraintVertex.y == goToVertex->y)
+                    if(constraintOrient.constraintVertex.x == goToVertex->vertexCor.x && constraintOrient.constraintVertex.y == goToVertex->vertexCor.y)
                     {
                         //does not work with one of the constraints
                         notGoodEdge = true;
@@ -469,7 +469,7 @@ void glProgressWidget::walkToVertex(edgeWalker* walker, glProgressWidget::constr
         return;
 
     //keep track of edge
-    glMeshSelectWidget::edge* bestEdge = meshEdges->value(walker->startVertex->edgeIndicies[index]);
+    glMeshSelectWidget::Edge* bestEdge = meshEdges->value(walker->startVertex->edgeIndicies[index]);
     walker->edgesIWalked.append(bestEdge);
 
     //keep track of vertex used
@@ -487,7 +487,7 @@ void glProgressWidget::walkToVertex(edgeWalker* walker, glProgressWidget::constr
     }
 }
 
-glProgressWidget::edgeWalker* glProgressWidget::constraintEdgeDoesExist(glMeshSelectWidget::vertex* vertexA, glMeshSelectWidget::vertex* vertexB)
+glProgressWidget::edgeWalker* glProgressWidget::constraintEdgeDoesExist(glMeshSelectWidget::Vertex* vertexA, glMeshSelectWidget::Vertex* vertexB)
 {
     for(int i = 0; i < constraintEdgesWithPoints.size(); i++)
     {
@@ -501,7 +501,7 @@ glProgressWidget::edgeWalker* glProgressWidget::constraintEdgeDoesExist(glMeshSe
     return 0;
 }
 
-glProgressWidget::constraintOrientationSet glProgressWidget::createConstraintOrientationSet(glMeshSelectWidget::vertex* vertexA, glMeshSelectWidget::vertex* vertexB)
+glProgressWidget::constraintOrientationSet glProgressWidget::createConstraintOrientationSet(glMeshSelectWidget::Vertex* vertexA, glMeshSelectWidget::Vertex* vertexB)
 {
     constraintOrientationSet set;
     set.startConstraint = vertexA; //always start from A
@@ -510,8 +510,8 @@ glProgressWidget::constraintOrientationSet glProgressWidget::createConstraintOri
     {
         MathAlgorithms::Vertex constraintVertex = ConstraintMatches[i].vertexInMesh;
 
-        if((constraintVertex.x == vertexA->x && constraintVertex.y == vertexA->y)
-        || (constraintVertex.x == vertexB->x && constraintVertex.y == vertexB->y))
+        if((constraintVertex.x == vertexA->vertexCor.x && constraintVertex.y == vertexA->vertexCor.y)
+        || (constraintVertex.x == vertexB->vertexCor.x && constraintVertex.y == vertexB->vertexCor.y))
         {
             //constraint is one of the end points, don't add it
         }
@@ -532,7 +532,7 @@ glProgressWidget::constraintOrientationSet glProgressWidget::createConstraintOri
     return set;
 }
 
-float glProgressWidget::crossProduct(MathAlgorithms::Vertex point1, glMeshSelectWidget::vertex* point2, glMeshSelectWidget::vertex* point3)
+float glProgressWidget::crossProduct(MathAlgorithms::Vertex point1, glMeshSelectWidget::Vertex* point2, glMeshSelectWidget::Vertex* point3)
 {
 //    MathAlgorithms::Vertex vectorA;
 //    vectorA.x = point2->x - point1.x;
@@ -557,7 +557,7 @@ float glProgressWidget::crossProduct(MathAlgorithms::Vertex point1, glMeshSelect
 //    //do cross product but only for the z component, since that is the only one we are interested in
 //    float signOfCrossProduct = (vectorA.x * vectorB.y) - (vectorA.y * vectorB.x);
     //float signOfCrossProduct = (point2->x - point3->x)*(point1.y - point3->y) > (point2->y - point3->y)*(point1.x - point3->x);
-    float signOfCrossProduct = (point1.x - point3->x) * (point2->y - point3->y) > (point2->x - point3->x) * (point1.y - point3->y);
+    float signOfCrossProduct = (point1.x - point3->vertexCor.x) * (point2->vertexCor.y - point3->vertexCor.y) > (point2->vertexCor.x - point3->vertexCor.x) * (point1.y - point3->vertexCor.y);
     return signOfCrossProduct;
 }
 

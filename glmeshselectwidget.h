@@ -9,8 +9,6 @@
 #include <set>
 #include <vector>
 #include "mathalgorithms.h"
-#include <GL/gl.h>
-#include <GL/glu.h>
 
 #define GL_MESHWIDGET_CANVAS_WIDTH 150
 #define GL_MESHWIDGET_CANVAS_HEIGHT 150
@@ -24,30 +22,28 @@ class glMeshSelectWidget: public QGLWidget
 public:
 
 public:
-    struct vertex
+    struct Vertex
     {
-        GLfloat x;
-        GLfloat y;
-        GLfloat z;
+        MathAlgorithms::Vertex vertexCor;
         QVector<int> edgeIndicies;
         QVector<int> triangleIndicies;
     };
 
-    struct edge
+    struct Edge
     {
-        vertex* vertexA;
-        vertex* vertexB;
+        Vertex* vertexA;
+        Vertex* vertexB;
         QVector<int> triangleIndicies;
     };
 
-    struct triangle
+    struct Triangle
     {
-        vertex* vertexA;
-        vertex* vertexB;
-        vertex* vertexC;
-        edge* edgeA;
-        edge* edgeB;
-        edge* edgeC;
+        Vertex* vertexA;
+        Vertex* vertexB;
+        Vertex* vertexC;
+        Edge* edgeA;
+        Edge* edgeB;
+        Edge* edgeC;
     };
 
 
@@ -64,9 +60,9 @@ public:
     void SetEnableConstraintSelection(bool aValue);
     QVector<MathAlgorithms::Vertex> createBorderConstraints();
 
-    QVector<vertex*>* GetVertices();
-    QVector<edge*>* GetEdges();
-    QVector<triangle*>* GetTriangles();
+    QVector<Vertex*>* GetVertices();
+    QVector<Edge*>* GetEdges();
+    QVector<Triangle*>* GetTriangles();
 
 protected:
     void initializeGL(); //called once before drawing happens
@@ -124,7 +120,7 @@ private:
 
     void DrawObject();
     void AddEdgesAndTriangles();
-    int FindEdgeIndex(const edge& e);
+    int FindEdgeIndex(const Edge& e);
 
     void RemoveFacesOutsideBoundary( std::set<unsigned int>& edgePoints );
     void AddVirtualBoundary( const std::set<unsigned int>& edgePoints );
@@ -134,9 +130,9 @@ private:
     constraintPoint CreateContraintPoint(int x, int y);
     std::vector<GLfloat> GetClosestVertex( GLfloat x, GLfloat y );
 
-    QVector<vertex*> m_qVertices;
-    QVector<edge*> m_qEdges;
-    QVector<triangle*> m_qTriangles;
+    QVector<Vertex*> m_qVertices;
+    QVector<Edge*> m_qEdges;
+    QVector<Triangle*> m_qTriangles;
 
     std::vector< std::vector< GLfloat > > m_vertices;
     std::vector< std::vector< unsigned int > > m_faces;

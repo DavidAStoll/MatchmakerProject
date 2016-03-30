@@ -36,6 +36,33 @@ class glTextureSelectWidget : public QGLWidget
         vertexCor rightTop;
         vertexCor leftBottom;
         vertexCor leftTop;
+
+        constraintPoint()
+        {
+
+        }
+
+        constraintPoint(GLfloat xLocation, GLfloat yLocation)
+        {
+            pixelXLocation = xLocation;
+            pixelYLocation = yLocation;
+            //Left Bottom
+            leftBottom.x = pixelXLocation - GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
+            leftBottom.y = pixelYLocation - GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
+            leftBottom.z = 0;
+            //Left Top
+            leftTop.x = pixelXLocation - GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
+            leftTop.y = pixelYLocation + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
+            leftTop.z = 0;
+            //Right Bottom
+            rightBottom.x = pixelXLocation + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
+            rightBottom.y = pixelYLocation - GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
+            rightBottom.z = 0;
+            //Right Top
+            rightTop.x = pixelXLocation + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
+            rightTop.y = pixelYLocation + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
+            rightTop.z = 0;
+        }
     };
 
     struct rectangle //since we want to span the entire area we need a rectangle
@@ -61,9 +88,9 @@ public:
     QVector<MathAlgorithms::Vertex> createBorderConstraints();
 
 
-    QVector<glMeshSelectWidget::vertex*>& GetVertices();
-    QVector<glMeshSelectWidget::edge*>& GetEdges();
-    QVector<glMeshSelectWidget::triangle*>& GetTriangles();
+    QVector<glMeshSelectWidget::Vertex*>& GetVertices();
+    QVector<glMeshSelectWidget::Edge*>& GetEdges();
+    QVector<glMeshSelectWidget::Triangle*>& GetTriangles();
 
 protected:
 
@@ -90,9 +117,9 @@ protected:
     QVector<MathAlgorithms::Triangle> triangulatedConstraints;
 
     //data structers used for matching, creating during triangulation
-    QVector<glMeshSelectWidget::vertex*> triangulatedVertexes;
-    QVector<glMeshSelectWidget::edge*> triangulatedEdges;
-    QVector<glMeshSelectWidget::triangle*> triangulatedTriangles;
+    QVector<glMeshSelectWidget::Vertex*> triangulatedVertexes;
+    QVector<glMeshSelectWidget::Edge*> triangulatedEdges;
+    QVector<glMeshSelectWidget::Triangle*> triangulatedTriangles;
 };
 
 #endif // GLTEXTURESELECTWIDGET_H

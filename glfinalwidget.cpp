@@ -40,15 +40,15 @@ void glFinalWidget::paintGL()
         glBegin( GL_TRIANGLES );
         for ( int i = 0; i < m_qTriangles->size(); ++i )
         {
-            glMeshSelectWidget::triangle* t = m_qTriangles->value(i);
-            glMeshSelectWidget::vertex a, b, c;
+            glMeshSelectWidget::Triangle* t = m_qTriangles->value(i);
+            glMeshSelectWidget::Vertex a, b, c;
             a = *(t->vertexA);
             b = *(t->vertexB);
             c = *(t->vertexC);
 
-            glVertex3f(a.x, a.y, a.z);
-            glVertex3f(b.x, b.y, b.z);
-            glVertex3f(c.x, c.y, c.z);
+            glVertex3f(a.vertexCor.x, a.vertexCor.y, a.vertexCor.z);
+            glVertex3f(b.vertexCor.x, b.vertexCor.y, b.vertexCor.z);
+            glVertex3f(c.vertexCor.x, c.vertexCor.y, c.vertexCor.z);
         }
         glEnd();
 
@@ -59,9 +59,9 @@ void glFinalWidget::paintGL()
         {
             glProgressWidget::validateTriangulation currentTriangle = m_validTriangulations[i];
 
-            glMeshSelectWidget::vertex* vertexA;
-            glMeshSelectWidget::vertex* vertexB;
-            glMeshSelectWidget::vertex* vertexC;
+            glMeshSelectWidget::Vertex* vertexA;
+            glMeshSelectWidget::Vertex* vertexB;
+            glMeshSelectWidget::Vertex* vertexC;
 
             vertexA = currentTriangle.edgeA->startVertex;
             if (vertexA == currentTriangle.edgeB->startVertex)
@@ -82,9 +82,9 @@ void glFinalWidget::paintGL()
                 vertexC = currentTriangle.edgeC->startVertex;
             }
 
-            glVertex3f(vertexA->x, vertexA->y, vertexA->z);
-            glVertex3f(vertexB->x, vertexB->y, vertexB->z);
-            glVertex3f(vertexC->x, vertexC->y, vertexC->z);
+            glVertex3f(vertexA->vertexCor.x, vertexA->vertexCor.y, vertexA->vertexCor.z);
+            glVertex3f(vertexB->vertexCor.x, vertexB->vertexCor.y, vertexB->vertexCor.z);
+            glVertex3f(vertexC->vertexCor.x, vertexC->vertexCor.y, vertexC->vertexCor.z);
         }
         glEnd();
 
@@ -135,9 +135,9 @@ void glFinalWidget::performEmbed()
     {
         glProgressWidget::validateTriangulation currentTriangle = m_validTriangulations[i];
 
-        glMeshSelectWidget::vertex* vertexA;
-        glMeshSelectWidget::vertex* vertexB;
-        glMeshSelectWidget::vertex* vertexC;
+        glMeshSelectWidget::Vertex* vertexA;
+        glMeshSelectWidget::Vertex* vertexB;
+        glMeshSelectWidget::Vertex* vertexC;
 
         vertexA = currentTriangle.edgeA->startVertex;
         if (vertexA == currentTriangle.edgeB->startVertex)
@@ -188,7 +188,7 @@ void glFinalWidget::performEmbed()
     updateGL();
 }
 
-bool glFinalWidget::HasThePoint(const glMeshSelectWidget::vertex *v)
+bool glFinalWidget::HasThePoint(const glMeshSelectWidget::Vertex *v)
 {
     bool hasThePoint = false;
     for(int i = 0; i < m_fixedPoints.size(); ++i)
@@ -227,17 +227,17 @@ void glFinalWidget::RepositionEdgePoints(glProgressWidget::edgeWalker* currentPa
         return;
     }
 
-    glMeshSelectWidget::vertex* start = currentPath->startVertex;
-    glMeshSelectWidget::vertex* target = currentPath->targetVertex;
+    glMeshSelectWidget::Vertex* start = currentPath->startVertex;
+    glMeshSelectWidget::Vertex* target = currentPath->targetVertex;
 
-    GLfloat deltaX = (target->x - start->x)/(currentPath->edgesIWalked.size());
-    GLfloat deltaY = (target->y - start->y)/(currentPath->edgesIWalked.size());
+    GLfloat deltaX = (target->vertexCor.x - start->vertexCor.x)/(currentPath->edgesIWalked.size());
+    GLfloat deltaY = (target->vertexCor.y - start->vertexCor.y)/(currentPath->edgesIWalked.size());
 
-    glMeshSelectWidget::vertex* startingPoint = start;
+    glMeshSelectWidget::Vertex* startingPoint = start;
     for(int j = 0; j < numOfVerticesAlongPath; ++j)
     {
-        glMeshSelectWidget::edge* currentEdge = currentPath->edgesIWalked[j];
-        glMeshSelectWidget::vertex* vertexToReposition;
+        glMeshSelectWidget::Edge* currentEdge = currentPath->edgesIWalked[j];
+        glMeshSelectWidget::Vertex* vertexToReposition;
         if (currentEdge->vertexA == startingPoint)
         {
             vertexToReposition = currentEdge->vertexB;
@@ -246,8 +246,8 @@ void glFinalWidget::RepositionEdgePoints(glProgressWidget::edgeWalker* currentPa
         {
             vertexToReposition = currentEdge->vertexA;
         }
-        vertexToReposition->x = start->x + deltaX * (j + 1);
-        vertexToReposition->y = start->y + deltaY * (j + 1);
+        vertexToReposition->vertexCor.x = start->vertexCor.x + deltaX * (j + 1);
+        vertexToReposition->vertexCor.y = start->vertexCor.y + deltaY * (j + 1);
 
         startingPoint = vertexToReposition;
 
@@ -258,12 +258,12 @@ void glFinalWidget::RepositionEdgePoints(glProgressWidget::edgeWalker* currentPa
     }
 }
 
-GLfloat glFinalWidget::Sign(const glMeshSelectWidget::vertex& p1, const glMeshSelectWidget::vertex& p2, const glMeshSelectWidget::vertex& p3)
+GLfloat glFinalWidget::Sign(const glMeshSelectWidget::Vertex& p1, const glMeshSelectWidget::Vertex& p2, const glMeshSelectWidget::Vertex& p3)
 {
-    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+    return (p1.vertexCor.x - p3.vertexCor.x) * (p2.vertexCor.y - p3.vertexCor.y) - (p2.vertexCor.x - p3.vertexCor.x) * (p1.vertexCor.y - p3.vertexCor.y);
 }
 
-bool glFinalWidget::PointInTriangle(const glMeshSelectWidget::vertex& pt, const glMeshSelectWidget::vertex& v1, const glMeshSelectWidget::vertex& v2, const glMeshSelectWidget::vertex& v3)
+bool glFinalWidget::PointInTriangle(const glMeshSelectWidget::Vertex& pt, const glMeshSelectWidget::Vertex& v1, const glMeshSelectWidget::Vertex& v2, const glMeshSelectWidget::Vertex& v3)
 {
   bool b1, b2, b3;
 
@@ -278,7 +278,7 @@ void glFinalWidget::RepositionInteriorPoints()
 {
     for (int vIndex = 0; vIndex < m_qVertices->size(); ++vIndex)
     {
-        glMeshSelectWidget::vertex* currentVertex = m_qVertices->value(vIndex);
+        glMeshSelectWidget::Vertex* currentVertex = m_qVertices->value(vIndex);
 
         if (HasThePoint(currentVertex))
         {
@@ -290,9 +290,9 @@ void glFinalWidget::RepositionInteriorPoints()
         {
             glProgressWidget::validateTriangulation currentTriangle = m_validTriangulations[pIndex];
 
-            glMeshSelectWidget::vertex* vertexA;
-            glMeshSelectWidget::vertex* vertexB;
-            glMeshSelectWidget::vertex* vertexC;
+            glMeshSelectWidget::Vertex* vertexA;
+            glMeshSelectWidget::Vertex* vertexB;
+            glMeshSelectWidget::Vertex* vertexC;
 
             vertexA = currentTriangle.edgeA->startVertex;
             if (vertexA == currentTriangle.edgeB->startVertex)
@@ -319,7 +319,7 @@ void glFinalWidget::RepositionInteriorPoints()
             if (pointInPatch)
             {
                 // Find all neighbors
-                QVector<glMeshSelectWidget::vertex*> neighbors;
+                QVector<glMeshSelectWidget::Vertex*> neighbors;
                 for (int eIndex = 0; eIndex < currentVertex->edgeIndicies.size(); ++eIndex)
                 {
                     int edgeIndex = currentVertex->edgeIndicies[eIndex];
@@ -334,29 +334,29 @@ void glFinalWidget::RepositionInteriorPoints()
                 }
 
                 // re-compute the position
-                glMeshSelectWidget::vertex sum;
-                sum.x = 0.0;
-                sum.y = 0.0;
-                sum.z = 0.0;
+                glMeshSelectWidget::Vertex sum;
+                sum.vertexCor.x = 0.0;
+                sum.vertexCor.y = 0.0;
+                sum.vertexCor.z = 0.0;
 
                 for (int nIndex = 0; nIndex < neighbors.size(); ++nIndex)
                 {
-                    sum.x += neighbors[nIndex]->x;
-                    sum.y += neighbors[nIndex]->y;
-                    sum.z += neighbors[nIndex]->z;
+                    sum.vertexCor.x += neighbors[nIndex]->vertexCor.x;
+                    sum.vertexCor.y += neighbors[nIndex]->vertexCor.y;
+                    sum.vertexCor.z += neighbors[nIndex]->vertexCor.z;
                 }
 
                 int num = neighbors.size();
                 if (num > 0)
                 {
-                    sum.x = sum.x/(GLfloat)num;
-                    sum.y = sum.y/(GLfloat)num;
-                    sum.z = sum.z/(GLfloat)num;
+                    sum.vertexCor.x = sum.vertexCor.x/(GLfloat)num;
+                    sum.vertexCor.y = sum.vertexCor.y/(GLfloat)num;
+                    sum.vertexCor.z = sum.vertexCor.z/(GLfloat)num;
 
                     // re-assign
-                    currentVertex->x = sum.x;
-                    currentVertex->y = sum.y;
-                    currentVertex->z = sum.z;
+                    currentVertex->vertexCor.x = sum.vertexCor.x;
+                    currentVertex->vertexCor.y = sum.vertexCor.y;
+                    currentVertex->vertexCor.z = sum.vertexCor.z;
                 }
                 break;
             }

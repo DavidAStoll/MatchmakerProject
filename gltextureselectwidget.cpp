@@ -138,12 +138,8 @@ void glTextureSelectWidget::mousePressEvent(QMouseEvent* mouseEvent)
          glTextureSelectWidget::constraintPoint point = createContraintPoint(mouseEvent->x(), mouseEvent->y());
          userConstraints.push_back(point);
 
-         MathAlgorithms::Vertex constraintVertex;
-         constraintVertex.x = point.leftBottom.x + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-         constraintVertex.y = point.leftBottom.y + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-         constraintVertex.z = 0;
-
-         MainWindow::globalInstance->progressWidget->addConstraintMatchForTexture(constraintVertex);
+         vertexCor& bottomLeft = point.leftBottom;
+         MainWindow::globalInstance->progressWidget->addConstraintMatchForTexture(MathAlgorithms::Vertex(bottomLeft.x + GL_TEXTUREWIDGET_CONSTRAINT_SIZE, bottomLeft.y + GL_TEXTUREWIDGET_CONSTRAINT_SIZE));
     }
 
     //redraw glWidget
@@ -196,77 +192,25 @@ void glTextureSelectWidget::loadTextureFromFile(QString& fileName)
 
 glTextureSelectWidget::constraintPoint glTextureSelectWidget::createContraintPoint(int x, int y)
 {
+    //convert to OpenGL cordinates
     int glXLocation = ((float) x / widgetWidth) * GL_TEXTUREWIDGET_CANVAS_WIDTH;
     int glYLocation = ((float) (widgetHeight - y) / widgetHeight) * GL_TEXTUREWIDGET_CANVAS_HEIGHT;
 
     //X and Y location is always center of the constraint point
-    constraintPoint newPoint;
-    newPoint.pixelXLocation = glXLocation;
-    newPoint.pixelYLocation = glYLocation;
-    //Left Bottom
-    newPoint.leftBottom.x = glXLocation - GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-    newPoint.leftBottom.y = glYLocation - GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-    newPoint.leftBottom.z = 0;
-    //Left Top
-    newPoint.leftTop.x = glXLocation - GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-    newPoint.leftTop.y = glYLocation + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-    newPoint.leftTop.z = 0;
-    //Right Bottom
-    newPoint.rightBottom.x = glXLocation + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-    newPoint.rightBottom.y = glYLocation - GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-    newPoint.rightBottom.z = 0;
-    //Right Top
-    newPoint.rightTop.x = glXLocation + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-    newPoint.rightTop.y = glYLocation + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-    newPoint.rightTop.z = 0;
-
-    return newPoint;
+    return constraintPoint (glXLocation, glYLocation);
 }
 
 void glTextureSelectWidget::triangulatePoints()
 {
-    QVector<MathAlgorithms::Vertex> points;
-
-    //add default border constraint points, calculate again to avoid roundoff error
-    //Bottom
-    MathAlgorithms::Vertex vertex;
-    vertex.x = 0; vertex.y = 0; vertex.z = 0;
-    points.append(vertex);
-    vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH / 3; vertex.y = 0; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
-    vertex.x = (2 * GL_TEXTUREWIDGET_CANVAS_WIDTH) / 3; vertex.y = 0; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
-    vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH; vertex.y = 0; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
-    //Top
-    vertex.x = 0; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
-    vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH / 3; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
-    vertex.x = (2 * GL_TEXTUREWIDGET_CANVAS_WIDTH) / 3; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
-    vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
-    //Left
-    vertex.x = 0; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT / 3; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
-    vertex.x = 0; vertex.y = (2 * GL_TEXTUREWIDGET_CANVAS_HEIGHT) / 3; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
-    //Right
-    vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT / 3; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
-    vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH; vertex.y = (2 * GL_TEXTUREWIDGET_CANVAS_HEIGHT) / 3; vertex.z = 0;
-    points.append(MathAlgorithms::Vertex(vertex));
+    //fill list with pre-defined border constraint points
+    QVector<MathAlgorithms::Vertex> points = MainWindow::globalInstance->glTextureWidget->createBorderConstraints();
 
     //add user constraint points
     for(int i = 0; i < userConstraints.size(); i++)
     {
         //need to find center of the constraint point
-        float xLocation = userConstraints[i].leftBottom.x + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-        float yLocation = userConstraints[i].leftBottom.y + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-
-        vertex.x = xLocation; vertex.y = yLocation; vertex.z = 0;
-        points.append(MathAlgorithms::Vertex(vertex));
+        vertexCor& bottomLeft = userConstraints[i].leftBottom;
+        points.append( MathAlgorithms::Vertex(bottomLeft.x + GL_TEXTUREWIDGET_CONSTRAINT_SIZE, bottomLeft.y + GL_TEXTUREWIDGET_CONSTRAINT_SIZE));
     }
 
     triangulatedConstraints = MathAlgorithms::getDelaunayTriangulation(points);
@@ -282,17 +226,17 @@ void glTextureSelectWidget::SetEnableConstraintSelection(bool aValue)
    enableSetConstraint = aValue;
 }
 
-QVector<glMeshSelectWidget::vertex*>& glTextureSelectWidget::GetVertices()
+QVector<glMeshSelectWidget::Vertex*>& glTextureSelectWidget::GetVertices()
 {
     return triangulatedVertexes;
 }
 
-QVector<glMeshSelectWidget::edge*>& glTextureSelectWidget::GetEdges()
+QVector<glMeshSelectWidget::Edge*>& glTextureSelectWidget::GetEdges()
 {
     return triangulatedEdges;
 }
 
-QVector<glMeshSelectWidget::triangle*>& glTextureSelectWidget::GetTriangles()
+QVector<glMeshSelectWidget::Triangle*>& glTextureSelectWidget::GetTriangles()
 {
     return triangulatedTriangles;
 }
@@ -307,40 +251,28 @@ void glTextureSelectWidget::buildStructers()
     for (int i = 0; i < triangulatedConstraints.size(); i++ )
     {
         MathAlgorithms::Triangle currentTriangle = triangulatedConstraints[i];
-        glMeshSelectWidget::triangle* matchTriangle = new glMeshSelectWidget::triangle;
-        glMeshSelectWidget::vertex* matchVertexA = 0;
-        glMeshSelectWidget::vertex* matchVertexB = 0;
-        glMeshSelectWidget::vertex* matchVertexC = 0;
+        glMeshSelectWidget::Triangle* matchTriangle = new glMeshSelectWidget::Triangle;
+        glMeshSelectWidget::Vertex* matchVertexA = 0;
+        glMeshSelectWidget::Vertex* matchVertexB = 0;
+        glMeshSelectWidget::Vertex* matchVertexC = 0;
 
-        //check if verticies are already in list or not
+        //check if verticies are already in list
         for(int vertexIndex = 0; vertexIndex < triangulatedVertexes.size(); vertexIndex++)
         {
-           if(currentTriangle.point1.x == triangulatedVertexes[vertexIndex]->x
-           && currentTriangle.point1.y == triangulatedVertexes[vertexIndex]->y
-           && currentTriangle.point1.z == triangulatedVertexes[vertexIndex]->z)
+           glMeshSelectWidget::Vertex* vertex = triangulatedVertexes[vertexIndex];
+
+           if(currentTriangle.point1 == vertex->vertexCor)
            {
-              matchVertexA = triangulatedVertexes[vertexIndex];
-              break;
+            matchVertexA = vertex;
            }
-        }
-        for(int vertexIndex = 0; vertexIndex < triangulatedVertexes.size(); vertexIndex++)
-        {
-           if(currentTriangle.point2.x == triangulatedVertexes[vertexIndex]->x
-           && currentTriangle.point2.y == triangulatedVertexes[vertexIndex]->y
-           && currentTriangle.point2.z == triangulatedVertexes[vertexIndex]->z)
+           else if
+           (currentTriangle.point2 == vertex->vertexCor)
            {
-              matchVertexB = triangulatedVertexes[vertexIndex];
-              break;
+            matchVertexB = vertex;
            }
-        }
-        for(int vertexIndex = 0; vertexIndex < triangulatedVertexes.size(); vertexIndex++)
-        {
-           if(currentTriangle.point3.x == triangulatedVertexes[vertexIndex]->x
-           && currentTriangle.point3.y == triangulatedVertexes[vertexIndex]->y
-           && currentTriangle.point3.z == triangulatedVertexes[vertexIndex]->z)
+           else if(currentTriangle.point3 == vertex->vertexCor)
            {
-              matchVertexC = triangulatedVertexes[vertexIndex];
-              break;
+            matchVertexC = vertex;
            }
         }
 
@@ -348,10 +280,10 @@ void glTextureSelectWidget::buildStructers()
         if(matchVertexA == 0)
         {
             //need to create a new one
-             glMeshSelectWidget::vertex* matchVertex = new glMeshSelectWidget::vertex;
-             matchVertex->x = currentTriangle.point1.x;
-             matchVertex->y = currentTriangle.point1.y;
-             matchVertex->z = currentTriangle.point1.z;
+             glMeshSelectWidget::Vertex* matchVertex = new glMeshSelectWidget::Vertex;
+             matchVertex->vertexCor.x = currentTriangle.point1.x;
+             matchVertex->vertexCor.y = currentTriangle.point1.y;
+             matchVertex->vertexCor.z = currentTriangle.point1.z;
              triangulatedVertexes.append(matchVertex);
 
              matchVertexA = triangulatedVertexes[triangulatedVertexes.size() - 1]; //need reference to it
@@ -359,10 +291,10 @@ void glTextureSelectWidget::buildStructers()
         if(matchVertexB == 0)
         {
             //need to create a new one
-             glMeshSelectWidget::vertex* matchVertex = new glMeshSelectWidget::vertex;
-             matchVertex->x = currentTriangle.point2.x;
-             matchVertex->y = currentTriangle.point2.y;
-             matchVertex->z = currentTriangle.point2.z;
+             glMeshSelectWidget::Vertex* matchVertex = new glMeshSelectWidget::Vertex;
+             matchVertex->vertexCor.x = currentTriangle.point2.x;
+             matchVertex->vertexCor.y = currentTriangle.point2.y;
+             matchVertex->vertexCor.z = currentTriangle.point2.z;
              triangulatedVertexes.append(matchVertex);
 
              matchVertexB = triangulatedVertexes[triangulatedVertexes.size() - 1]; //need reference to it
@@ -370,19 +302,19 @@ void glTextureSelectWidget::buildStructers()
         if(matchVertexC == 0)
         {
             //need to create a new one
-             glMeshSelectWidget::vertex* matchVertex = new glMeshSelectWidget::vertex;
-             matchVertex->x = currentTriangle.point3.x;
-             matchVertex->y = currentTriangle.point3.y;
-             matchVertex->z = currentTriangle.point3.z;
+             glMeshSelectWidget::Vertex* matchVertex = new glMeshSelectWidget::Vertex;
+             matchVertex->vertexCor.x = currentTriangle.point3.x;
+             matchVertex->vertexCor.y = currentTriangle.point3.y;
+             matchVertex->vertexCor.z = currentTriangle.point3.z;
              triangulatedVertexes.append(matchVertex);
 
              matchVertexC = triangulatedVertexes[triangulatedVertexes.size() - 1]; //need reference to it
         }
 
         //create or find edges
-        glMeshSelectWidget::edge* matchEdgeA = 0;
-        glMeshSelectWidget::edge* matchEdgeB = 0;
-        glMeshSelectWidget::edge* matchEdgeC = 0;
+        glMeshSelectWidget::Edge* matchEdgeA = 0;
+        glMeshSelectWidget::Edge* matchEdgeB = 0;
+        glMeshSelectWidget::Edge* matchEdgeC = 0;
         //edge is made up by vertexA and vertex B, check if vertexA has already this edge, if it has the edge is already in the edge list
         for(int edgeIndex = 0; edgeIndex < matchVertexA->edgeIndicies.size(); edgeIndex++)
         {
@@ -411,7 +343,7 @@ void glTextureSelectWidget::buildStructers()
         if(matchEdgeA == 0)
         {
             //need to create a new one
-             glMeshSelectWidget::edge* matchEdge = new glMeshSelectWidget::edge;
+             glMeshSelectWidget::Edge* matchEdge = new glMeshSelectWidget::Edge;
              matchEdge->vertexA = matchVertexA;
              matchEdge->vertexB = matchVertexB;
              triangulatedEdges.append(matchEdge);
@@ -421,7 +353,7 @@ void glTextureSelectWidget::buildStructers()
         if(matchEdgeB == 0)
         {
             //need to create a new one
-             glMeshSelectWidget::edge* matchEdge = new glMeshSelectWidget::edge;
+             glMeshSelectWidget::Edge* matchEdge = new glMeshSelectWidget::Edge;
              matchEdge->vertexA = matchVertexB;
              matchEdge->vertexB = matchVertexC;
              triangulatedEdges.append(matchEdge);
@@ -431,7 +363,7 @@ void glTextureSelectWidget::buildStructers()
         if(matchEdgeC == 0)
         {
             //need to create a new one
-             glMeshSelectWidget::edge* matchEdge = new glMeshSelectWidget::edge;
+             glMeshSelectWidget::Edge* matchEdge = new glMeshSelectWidget::Edge;
              matchEdge->vertexA = matchVertexA;
              matchEdge->vertexB = matchVertexC;
              triangulatedEdges.append(matchEdge);
@@ -467,43 +399,21 @@ void glTextureSelectWidget::buildStructers()
 
      //add default border constraint points, calculate again to avoid roundoff error
      //Bottom
-     MathAlgorithms::Vertex vertex;
-     vertex.x = 0; vertex.y = 0; vertex.z = 0;
-     points.append(vertex);
-     vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH / 3; vertex.y = 0; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
-     vertex.x = (2 * GL_TEXTUREWIDGET_CANVAS_WIDTH) / 3; vertex.y = 0; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
-     vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH; vertex.y = 0; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
+     points.append(MathAlgorithms::Vertex (0,0));
+     points.append(MathAlgorithms::Vertex (GL_TEXTUREWIDGET_CANVAS_WIDTH / 3, 0));
+     points.append(MathAlgorithms::Vertex ((2 * GL_TEXTUREWIDGET_CANVAS_WIDTH) / 3, 0));
+     points.append(MathAlgorithms::Vertex (GL_TEXTUREWIDGET_CANVAS_WIDTH, 0));
      //Top
-     vertex.x = 0; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
-     vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH / 3; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
-     vertex.x = (2 * GL_TEXTUREWIDGET_CANVAS_WIDTH) / 3; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
-     vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
+     points.append(MathAlgorithms::Vertex (0, GL_TEXTUREWIDGET_CANVAS_HEIGHT));
+     points.append(MathAlgorithms::Vertex (GL_TEXTUREWIDGET_CANVAS_WIDTH / 3, GL_TEXTUREWIDGET_CANVAS_HEIGHT));
+     points.append(MathAlgorithms::Vertex ((2 * GL_TEXTUREWIDGET_CANVAS_WIDTH) / 3, GL_TEXTUREWIDGET_CANVAS_HEIGHT));
+     points.append(MathAlgorithms::Vertex (GL_TEXTUREWIDGET_CANVAS_WIDTH, GL_TEXTUREWIDGET_CANVAS_HEIGHT));
      //Left
-     vertex.x = 0; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT / 3; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
-     vertex.x = 0; vertex.y = (2 * GL_TEXTUREWIDGET_CANVAS_HEIGHT) / 3; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
+     points.append(MathAlgorithms::Vertex (0, GL_TEXTUREWIDGET_CANVAS_HEIGHT / 3));
+     points.append(MathAlgorithms::Vertex (0, (2 * GL_TEXTUREWIDGET_CANVAS_HEIGHT) / 3));
      //Right
-     vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH; vertex.y = GL_TEXTUREWIDGET_CANVAS_HEIGHT / 3; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
-     vertex.x = GL_TEXTUREWIDGET_CANVAS_WIDTH; vertex.y = (2 * GL_TEXTUREWIDGET_CANVAS_HEIGHT) / 3; vertex.z = 0;
-     points.append(MathAlgorithms::Vertex(vertex));
-
-//     for ( int i = 0; i < 12; ++i )
-//     {
-//         MathAlgorithms::Vertex vertex;
-//         vertex.x =  borderConstraints[i].leftBottom.x + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-//         vertex.y =  borderConstraints[i].leftBottom.y + GL_TEXTUREWIDGET_CONSTRAINT_SIZE;
-//         vertex.z = 0;
-//         points.push_back(vertex);
-//     }
+     points.append(MathAlgorithms::Vertex (GL_TEXTUREWIDGET_CANVAS_WIDTH, GL_TEXTUREWIDGET_CANVAS_HEIGHT / 3));
+     points.append(MathAlgorithms::Vertex (GL_TEXTUREWIDGET_CANVAS_WIDTH, (2 * GL_TEXTUREWIDGET_CANVAS_HEIGHT) / 3));
 
      return points;
  }

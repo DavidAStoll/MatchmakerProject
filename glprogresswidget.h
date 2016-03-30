@@ -20,9 +20,9 @@ public:
     struct edgeWalker
     {
         bool success;
-        glMeshSelectWidget::vertex* startVertex;
-        glMeshSelectWidget::vertex* targetVertex;
-        QVector<glMeshSelectWidget::edge*> edgesIWalked;
+        glMeshSelectWidget::Vertex* startVertex;
+        glMeshSelectWidget::Vertex* targetVertex;
+        QVector<glMeshSelectWidget::Edge*> edgesIWalked;
     };
 
     struct validateTriangulation
@@ -40,7 +40,7 @@ public:
 
     struct constraintOrientationSet
     {
-        glMeshSelectWidget::vertex* startConstraint;
+        glMeshSelectWidget::Vertex* startConstraint;
         QVector<constraintOrientation> constraintOrientations;
     };
 
@@ -62,16 +62,16 @@ protected:
     void resizeGL(int width, int height); //called when widget size changes
     void mousePressEvent(QMouseEvent *event); //when mouse is pressed inside the area
     void walkToVertex(edgeWalker* walker, constraintOrientationSet& constraintOrientations);
-    edgeWalker* constraintEdgeDoesExist(glMeshSelectWidget::vertex* vertexA, glMeshSelectWidget::vertex* vertexB);
-    constraintOrientationSet createConstraintOrientationSet(glMeshSelectWidget::vertex* vertexA, glMeshSelectWidget::vertex* vertexB);
-    float crossProduct(MathAlgorithms::Vertex point1, glMeshSelectWidget::vertex* point2, glMeshSelectWidget::vertex* point3);
+    edgeWalker* constraintEdgeDoesExist(glMeshSelectWidget::Vertex* vertexA, glMeshSelectWidget::Vertex* vertexB);
+    constraintOrientationSet createConstraintOrientationSet(glMeshSelectWidget::Vertex* vertexA, glMeshSelectWidget::Vertex* vertexB);
+    float crossProduct(MathAlgorithms::Vertex point1, glMeshSelectWidget::Vertex* point2, glMeshSelectWidget::Vertex* point3);
 
     QVector<ConstraintMatch> ConstraintMatches;
-    QVector<glMeshSelectWidget::vertex*>* meshVertices;
-    QVector<glMeshSelectWidget::edge*>* meshEdges;
-    QVector<glMeshSelectWidget::triangle*>* meshTriangles;
+    QVector<glMeshSelectWidget::Vertex*>* meshVertices;
+    QVector<glMeshSelectWidget::Edge*>* meshEdges;
+    QVector<glMeshSelectWidget::Triangle*>* meshTriangles;
     QVector<edgeWalker*> constraintEdgesWithPoints;
-    QVector<glMeshSelectWidget::vertex*> doNotWalkVertices;
+    QVector<glMeshSelectWidget::Vertex*> doNotWalkVertices;
     QVector<validateTriangulation> validTriangulations;
 };
 

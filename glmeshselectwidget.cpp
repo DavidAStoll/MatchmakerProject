@@ -230,12 +230,12 @@ void glMeshSelectWidget::AddEdgesAndTriangles()
         unsigned int v2 = currentFace[1] - 1;
         unsigned int v3 = currentFace[2] - 1;
 
-        triangle* t = new triangle;
+        Triangle* t = new Triangle;
         t->vertexA = m_qVertices[v1];
         t->vertexB = m_qVertices[v2];
         t->vertexC = m_qVertices[v3];
 
-        edge* e1 = new edge;
+        Edge* e1 = new Edge;
         e1->vertexA = m_qVertices[v1];
         e1->vertexB = m_qVertices[v2];
 
@@ -252,7 +252,7 @@ void glMeshSelectWidget::AddEdgesAndTriangles()
         }
         t->edgeA = m_qEdges[index];
 
-        edge* e2 = new edge;
+        Edge* e2 = new Edge;
         e2->vertexA = m_qVertices[v2];
         e2->vertexB = m_qVertices[v3];
 
@@ -269,7 +269,7 @@ void glMeshSelectWidget::AddEdgesAndTriangles()
         }
         t->edgeB = m_qEdges[index];
 
-        edge* e3 = new edge;
+        Edge* e3 = new Edge;
         e3->vertexA = m_qVertices[v3];
         e3->vertexB = m_qVertices[v1];
 
@@ -513,12 +513,12 @@ void glMeshSelectWidget::AddVirtualBoundary( const std::set<unsigned int>& edgeP
     }
 }
 
-int glMeshSelectWidget::FindEdgeIndex(const edge &e)
+int glMeshSelectWidget::FindEdgeIndex(const Edge &e)
 {
     int index = -1;
     for (unsigned int i = 0; i < m_qEdges.size(); ++i)
     {
-        edge& currentEdge = *m_qEdges[i];
+        Edge& currentEdge = *m_qEdges[i];
         if ((currentEdge.vertexA == e.vertexA && currentEdge.vertexB == e.vertexB) || (currentEdge.vertexA == e.vertexB && currentEdge.vertexB == e.vertexA))
         {
             index = i;
@@ -532,10 +532,10 @@ void glMeshSelectWidget::MakeNewStructure()
 {
     for (unsigned int i = 0; i < m_vertices.size(); ++i)
     {
-        vertex* v = new vertex;
-        v->x = m_vertices[i][0];
-        v->y = m_vertices[i][1];
-        v->z = m_vertices[i][2];
+        Vertex* v = new Vertex;
+        v->vertexCor.x = m_vertices[i][0];
+        v->vertexCor.y = m_vertices[i][1];
+        v->vertexCor.z = m_vertices[i][2];
         //v->edgeIndicies = new QVector<int>;
        // v->triangleIndicies = new QVector<int>;
         m_qVertices.push_back(v);
@@ -544,17 +544,17 @@ void glMeshSelectWidget::MakeNewStructure()
     AddEdgesAndTriangles();
 }
 
-QVector<glMeshSelectWidget::vertex*>* glMeshSelectWidget::GetVertices()
+QVector<glMeshSelectWidget::Vertex*>* glMeshSelectWidget::GetVertices()
 {
     return &m_qVertices;
 }
 
-QVector<glMeshSelectWidget::edge*>* glMeshSelectWidget::GetEdges()
+QVector<glMeshSelectWidget::Edge*>* glMeshSelectWidget::GetEdges()
 {
     return &m_qEdges;
 }
 
-QVector<glMeshSelectWidget::triangle*>* glMeshSelectWidget::GetTriangles()
+QVector<glMeshSelectWidget::Triangle*>* glMeshSelectWidget::GetTriangles()
 {
     return &m_qTriangles;
 }
