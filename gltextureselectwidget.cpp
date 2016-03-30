@@ -257,7 +257,7 @@ void glTextureSelectWidget::buildStructers()
         glMeshSelectWidget::Vertex* matchVertexC = 0;
 
         //chech already created vertices if the one we are looking for is already in the list, don't want duplicates
-        auto findVertexInTriangulatedVertexes = [=] (glMeshSelectWidget::Vertex*& vertexPointer, MathAlgorithms::Vertex& vertexData)
+        auto findVertexInTriangulatedVertexes = [&] (glMeshSelectWidget::Vertex*& vertexPointer, MathAlgorithms::Vertex& vertexData)
         {
             for(int vertexIndex = 0; vertexIndex < triangulatedVertexes.size(); vertexIndex++)
             {
@@ -275,7 +275,7 @@ void glTextureSelectWidget::buildStructers()
         findVertexInTriangulatedVertexes(matchVertexC, currentTriangle.point3);
 
         //create vertices for those not found
-        auto createVertexIfNotFound = [=](glMeshSelectWidget::Vertex*& vertex, MathAlgorithms::Vertex& vertexData)
+        auto createVertexIfNotFound = [&](glMeshSelectWidget::Vertex*& vertex, MathAlgorithms::Vertex& vertexData)
         {
            if(vertex == 0)
            {
@@ -297,7 +297,7 @@ void glTextureSelectWidget::buildStructers()
         glMeshSelectWidget::Edge* matchEdgeC = 0;
 
         //check for existing edges
-        auto findEdgeWithVertices = [=] (glMeshSelectWidget::Edge*& edgePointer, glMeshSelectWidget::Vertex* vertexA, glMeshSelectWidget::Vertex* vertexB)
+        auto findEdgeWithVertices = [&] (glMeshSelectWidget::Edge*& edgePointer, glMeshSelectWidget::Vertex* vertexA, glMeshSelectWidget::Vertex* vertexB)
         {
             for(int edgeIndex = 0; edgeIndex < matchVertexA->edgeIndicies.size(); edgeIndex++)
             {
@@ -315,7 +315,7 @@ void glTextureSelectWidget::buildStructers()
         findEdgeWithVertices(matchEdgeC, matchVertexC, matchVertexA);
 
         //create vertices for those not found
-        auto createEdgeIfNotFound = [=](glMeshSelectWidget::Edge*& edgePointer, glMeshSelectWidget::Vertex* vertexA, glMeshSelectWidget::Vertex* vertexB)
+        auto createEdgeIfNotFound = [&](glMeshSelectWidget::Edge*& edgePointer, glMeshSelectWidget::Vertex* vertexA, glMeshSelectWidget::Vertex* vertexB)
         {
            if(edgePointer == 0)
            {
