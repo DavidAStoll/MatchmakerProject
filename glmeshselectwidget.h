@@ -27,6 +27,14 @@ public:
         MathAlgorithms::Vertex vertexCor;
         QVector<int> edgeIndicies;
         QVector<int> triangleIndicies;
+
+        Vertex()
+        {}
+
+        Vertex(GLfloat x, GLfloat y)
+        {
+            vertexCor = MathAlgorithms::Vertex(x,y);
+        }
     };
 
     struct Edge
@@ -34,6 +42,14 @@ public:
         Vertex* vertexA;
         Vertex* vertexB;
         QVector<int> triangleIndicies;
+
+        Edge(){}
+
+        Edge(Vertex* vertexA, Vertex* vertexB)
+        {
+            this->vertexA = vertexA;
+            this->vertexB = vertexB;
+        }
     };
 
     struct Triangle
